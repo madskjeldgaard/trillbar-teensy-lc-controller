@@ -6,7 +6,7 @@
 Trill trillSensor;
 boolean touchActive = false;
 
-constexpr uint8_t speed = 2; // 0 to 3 (fast to slowest)
+constexpr uint8_t speed = 0; // 0 to 3 (fast to slowest)
 constexpr uint8_t bits = 11; // 9 to 16 bits
 
 // Calibrate per sensor
@@ -43,7 +43,6 @@ void send14BitMidi(int ccNum, int value, int channel) {
   usbMIDI.sendControlChange(ccNum, highBitVal, channel);
 }
 
-;
 
 // Linear scaling
 template <typename T> T linlin(T x, T in_min, T in_max, T out_min, T out_max) {
@@ -62,8 +61,8 @@ void sendLocation(size_t fingerNum, int location) {
 };
 
 void sendTrigger(size_t fingerNum, bool triggerOn) {
-  const auto value = triggerOn ? 127 : 0;
-  usbMIDI.sendControlChange(fingerNum, value, triggerChannel);
+  const auto value = triggerOn ? maxMidiVal : 0;
+  send14BitMidi(fingerNum, value, triggerChannel);
 };
 
 void setup() {
@@ -88,6 +87,10 @@ void setup() {
   // Fill state with 0's
   state.fill(0);
   touchTrigger.fill(0);
+
+  // Turn on LED
+  pinMode(13, OUTPUT);
+  digitalWrite(13, HIGH);
 }
 
 void loop() {
